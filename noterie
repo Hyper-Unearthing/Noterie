@@ -1,0 +1,185 @@
+#!/bin/bash
+
+# Noterie - AI-powered note-taking using OpenCode
+# GitHub: https://github.com/Hyper-Unearthing/Noterie
+
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+NOTES_FILE="$SCRIPT_DIR/notes.txt"
+LAST_NOTE="$SCRIPT_DIR/last_note"
+SYSTEM_PROMPT_FILE="$SCRIPT_DIR/system-prompt.txt"
+STRATEGY_FILE="$SCRIPT_DIR/strategy.md"
+MODEL="opencode/grok-code"
+
+# Check dependencies
+check_dependencies() {
+    if ! command -v opencode &> /dev/null; then
+        echo "Error: opencode not found. Please install it first."
+        echo "Visit: https://opencode.ai"
+        exit 1
+    fi
+}
+
+# Build the full prompt
+build_prompt() {
+    local mode=$1
+    local user_content=$2
+    
+    # Read system prompt and strategy
+    local system_prompt=$(cat "$SYSTEM_PROMPT_FILE")
+    local strategy=$(cat "$STRATEGY_FILE")
+    
+    # Build prompt based on mode
+    case $mode in
+        append)
+            cat <<EOF
+$system_prompt
+
+## Note-taking Strategy
+$strategy
+
+## User Request
+The user has created a new note. Append it to the TOP of $NOTES_FILE with a timestamp in the format [YYYY-MM-DD HH:MM].
+
+## New Note Content
+$user_content
+
+Please append this note and confirm it has been saved.
+EOF
+            ;;
+        query)
+            cat <<EOF
+$system_prompt
+
+## Note-taking Strategy
+$strategy
+
+## User Request
+The user has a query about their notes. Read $NOTES_FILE and provide a helpful, concise answer.
+
+## Query
+$user_content
+EOF
+            ;;
+    esac
+}
+
+# Run OpenCode with the constructed prompt
+run_opencode() {
+    local prompt=$1
+    opencode run -m "$MODEL" "$prompt"
+}
+
+# Mode 1: Editor
+mode_editor() {
+    local editor=${EDITOR:-nano}
+    
+    # Create/clear last_note
+    > "$LAST_NOTE"
+    
+    # Open editor
+    $editor "$LAST_NOTE"
+    
+    # Read content
+    local content=$(cat "$LAST_NOTE")
+    
+    # Check if empty
+    if [ -z "$content" ] || [ "$content" = "" ]; then
+        echo "No note added."
+        rm -f "$LAST_NOTE"
+        exit 0
+    fi
+    
+    # Build and run prompt
+    local prompt=$(build_prompt "append" "$content")
+    run_opencode "$prompt"
+    
+    # Cleanup
+    rm -f "$LAST_NOTE"
+}
+
+# Mode 2: Quick note (-n)
+mode_note() {
+    local note_content="$*"
+    
+    if [ -z "$note_content" ]; then
+        echo "Error: Note content cannot be empty"
+        echo "Usage: noterie -n \"your note here\""
+        exit 1
+    fi
+    
+    local prompt=$(build_prompt "append" "$note_content")
+    run_opencode "$prompt"
+}
+
+# Mode 3: Query (-q)
+mode_query() {
+    local query="$*"
+    
+    if [ -z "$query" ]; then
+        echo "Error: Query cannot be empty"
+        echo "Usage: noterie -q \"your query here\""
+        exit 1
+    fi
+    
+    local prompt=$(build_prompt "query" "$query")
+    run_opencode "$prompt"
+}
+
+# Show help
+show_help() {
+    cat <<EOF
+Noterie - AI-powered note-taking using the append-and-review strategy
+
+Usage:
+  noterie           Open editor to add a note
+  noterie -n "..."  Add a quick note without opening editor
+  noterie -q "..."  Query your notes
+
+Examples:
+  noterie
+  noterie -n "Remember to review Q4 metrics tomorrow"
+  noterie -q "What todos do I have?"
+
+Files:
+  Notes:    $NOTES_FILE
+  Strategy: $STRATEGY_FILE
+  Prompt:   $SYSTEM_PROMPT_FILE
+
+GitHub: https://github.com/Hyper-Unearthing/Noterie
+EOF
+}
+
+# Main entry point
+main() {
+    check_dependencies
+    
+    # Ensure notes.txt exists
+    [ ! -f "$NOTES_FILE" ] && touch "$NOTES_FILE"
+    
+    # Parse arguments
+    case "${1:-}" in
+        -n)
+            shift
+            mode_note "$@"
+            ;;
+        -q)
+            shift
+            mode_query "$@"
+            ;;
+        -h|--help|help)
+            show_help
+            ;;
+        "")
+            mode_editor
+            ;;
+        *)
+            echo "Error: Unknown option: $1"
+            echo ""
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+main "$@"

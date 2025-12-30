@@ -1,0 +1,13 @@
+# User-specific files that shouldn't be in the repo
+notes.txt
+last_note
+
+# macOS
+.DS_Store
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
