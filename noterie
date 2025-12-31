@@ -86,7 +86,7 @@ run_opencode() {
 
 # Mode 1: Editor
 mode_editor() {
-    local editor=${EDITOR:-nano}
+    local editor=${EDITOR:-vim}
     
     # Create/clear last_note
     > "$LAST_NOTE"

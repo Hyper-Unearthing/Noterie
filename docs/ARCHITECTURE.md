@@ -152,7 +152,7 @@ MODEL                   # OpenCode model: opencode/grok-code
 
 **Flow**:
 1. Create/clear `last_note` file
-2. Open `$EDITOR` (or nano) with `last_note`
+2. Open `$EDITOR` (or vim) with `last_note`
 3. Wait for user to save and close
 4. Read contents of `last_note`
 5. Check if empty → if yes, show "No note added" and exit
@@ -255,7 +255,7 @@ User ← Display output ← Return response ← Search $NOTERIE_DIR
 |----------|----------|
 | OpenCode not installed | Show error, exit with code 1 |
 | `$NOTERIE_DIR` not set | Show error, exit with code 1 |
-| `$EDITOR` not set | Default to `nano` |
+| `$EDITOR` not set | Default to `vim` |
 | Empty editor content | Show "No note added", skip OpenCode |
 | Empty `-n` argument | Show error and usage |
 | Empty `-q` argument | Show error and usage |
@@ -321,7 +321,7 @@ Displays success message
   - OpenCode CLI (`opencode`)
   
 - **Optional**:
-  - `$EDITOR` environment variable (defaults to `nano`)
+  - `$EDITOR` environment variable (defaults to `vim`)
   
 ## Design Decisions
 

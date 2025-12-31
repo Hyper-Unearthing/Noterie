@@ -17,7 +17,7 @@ During installation, you'll be prompted to specify where you want to store your 
 ```bash
 noterie
 ```
-Opens your `$EDITOR` (or nano by default) to write a note. When you save and close, the note is appended to the top of your notes file.
+Opens your `$EDITOR` (or vim by default) to write a note. When you save and close, the note is appended to the top of your notes file.
 
 ### Quick note
 ```bash
@@ -108,7 +108,7 @@ mkdir -p $NOTERIE_DIR
 echo $EDITOR
 
 # Set it if empty
-export EDITOR=nano
+export EDITOR=vim
 ```
 
 
