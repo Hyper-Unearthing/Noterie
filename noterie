@@ -81,7 +81,7 @@ EOF
 # Run OpenCode with the constructed prompt
 run_opencode() {
     local prompt=$1
-    opencode run -m "$MODEL" "$prompt"
+    cd "$NOTES_DIR" && opencode run -m "$MODEL" "$prompt"
 }
 
 # Mode 1: Editor
