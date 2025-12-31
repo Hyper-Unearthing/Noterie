@@ -27,7 +27,7 @@ chmod +x "$INSTALL_DIR/noterie"
 echo ""
 echo "Where would you like to store your notes?"
 echo "(Press Enter for default: $HOME/notes)"
-read -r NOTES_PATH
+read -r NOTES_PATH < /dev/tty
 
 # Use default if empty
 if [ -z "$NOTES_PATH" ]; then
