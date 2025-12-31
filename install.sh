@@ -48,13 +48,18 @@ if [[ "$NOTES_PATH" != /* ]]; then
 fi
 
 # Detect shell and add to PATH
-if [ -n "$ZSH_VERSION" ]; then
-    RC_FILE="$HOME/.zshrc"
-elif [ -n "$BASH_VERSION" ]; then
-    RC_FILE="$HOME/.bashrc"
-else
-    RC_FILE="$HOME/.profile"
-fi
+CURRENT_SHELL="${SHELL:-/bin/bash}"
+case "$CURRENT_SHELL" in
+    */zsh)
+        RC_FILE="$HOME/.zshrc"
+        ;;
+    */bash)
+        RC_FILE="$HOME/.bashrc"
+        ;;
+    *)
+        RC_FILE="$HOME/.bashrc"
+        ;;
+esac
 
 # Add to PATH if not already present
 if ! grep -q 'export PATH="$PATH:$HOME/.noterie"' "$RC_FILE" 2>/dev/null; then
