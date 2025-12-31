@@ -120,27 +120,12 @@ MODEL                   # OpenCode model: opencode/grok-code
 
 ### 2. `system-prompt.txt` - OpenCode System Prompt
 
-**Purpose**: Defines OpenCode's behavior and responsibilities
-
-**Key Instructions**:
-- Decide where to save notes within the notes directory based on strategy
-- Add timestamp `[YYYY-MM-DD HH:MM]` to each note
-- Preserve user's exact wording
-- Confirm "Note saved." after saving
-- Keep responses brief and actionable
-- Search all files in notes directory when querying
+**Purpose**: Defines OpenCode's behavior and responsibilities, Users can edit this file to match their preferred approach
 
 ### 3. `strategy.md` - Note-taking Strategy
 
-**Purpose**: Defines the note-taking philosophy
+**Purpose**: Defines the note-taking philosophy, Users can edit this file to match their preferred approach
 
-**Key Concepts**:
-- Notes live in a directory (flexible organization)
-- AI decides file structure based on strategy
-- Notes can be in single or multiple files
-- AI searches all files when querying
-
-**Customization**: Users can edit this file to match their preferred approach
 
 ### 4. `install.sh` - Installation Script
 
@@ -255,9 +240,6 @@ OpenCode uses its built-in tools:
 User input → noterie script → Build prompt → OpenCode
                                                ↓
 User ← Display output ← Return response ← Save to $NOTERIE_DIR
-                                               ↓
-                                          Add timestamp
-                                          Prepend to top
 ```
 
 ### Query Note Flow
@@ -265,9 +247,6 @@ User ← Display output ← Return response ← Save to $NOTERIE_DIR
 User query → noterie script → Build prompt → OpenCode
                                                ↓
 User ← Display output ← Return response ← Search $NOTERIE_DIR
-                                               ↓
-                                          Read multiple files
-                                          Find relevant notes
 ```
 
 ## Error Handling
@@ -309,7 +288,7 @@ Users can customize Noterie by editing files in `~/.noterie/`:
 
 1. **`system-prompt.txt`**: Change AI behavior, timestamp format, response style
 2. **`strategy.md`**: Define custom note-taking philosophy
-3. **`noterie` script**: Change model, add new modes, modify prompts
+3. **`NOTERIE_DIR`**: Specify the directory to save notes
 
 ## Installation Flow
 
@@ -343,14 +322,7 @@ Displays success message
   
 - **Optional**:
   - `$EDITOR` environment variable (defaults to `nano`)
-
-## Version Information
-
-- **Version**: 1.0
-- **License**: MIT
-- **Repository**: https://github.com/Hyper-Unearthing/Noterie
-- **Model**: OpenCode Grok Code Fast (`opencode/grok-code`)
-
+  
 ## Design Decisions
 
 ### Why Bash?
@@ -385,68 +357,3 @@ Displays success message
 - Direct file operations ensure consistency
 - Simpler prompt construction
 - Better control over file updates
-
-## Future Enhancements (Potential)
-
-- Config file for model selection
-- Custom timestamp formats
-- Export/import functionality
-- Integration with other note systems
-- Web interface
-- Search improvements
-- Review mode automation
-
-## Testing
-
-Tested functionality:
-- ✅ Help command (`--help`)
-- ✅ Quick note mode (`-n`)
-- ✅ Query mode (`-q`)
-- ✅ Append-to-top behavior
-- ✅ Timestamp formatting
-- ✅ File path resolution
-- ✅ OpenCode integration
-- ✅ Error handling (empty content)
-
-## Troubleshooting
-
-### Command not found
-```bash
-# Make sure PATH is updated
-source ~/.zshrc  # or source ~/.bashrc
-
-# Verify noterie is in PATH
-which noterie
-
-# Should output: ~/.noterie/noterie
-```
-
-### OpenCode errors
-```bash
-# Check if opencode is installed
-which opencode
-
-# Test opencode directly
-opencode run -m opencode/grok-code "hello"
-```
-
-### Notes not saving
-```bash
-# Check if NOTERIE_DIR is set
-echo $NOTERIE_DIR
-
-# Check directory permissions
-ls -la $NOTERIE_DIR
-
-# Verify directory exists
-mkdir -p $NOTERIE_DIR
-```
-
-### Editor not opening
-```bash
-# Check EDITOR variable
-echo $EDITOR
-
-# Set it if empty
-export EDITOR=nano
-```

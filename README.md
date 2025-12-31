@@ -36,7 +36,6 @@ Ask questions about your notes. The AI will search through your notes and provid
 Noterie uses OpenCode (specifically Grok Code Fast) to intelligently manage your notes:
 - Notes are stored in your configured directory (`$NOTERIE_DIR`)
 - The AI organizes files based on your customizable strategy
-- Each note gets a timestamp when added: `[YYYY-MM-DD HH:MM]`
 - Your notes remain in plain text and searchable
 - Query across all your notes - the AI searches the entire directory
 
@@ -68,6 +67,50 @@ export NOTERIE_DIR="/new/path/to/notes"
 rm -rf ~/.noterie
 # Remove the PATH and NOTERIE_DIR export lines from your ~/.zshrc or ~/.bashrc
 ```
+
+## Troubleshooting
+
+### Command not found
+```bash
+# Make sure PATH is updated
+source ~/.zshrc  # or source ~/.bashrc
+
+# Verify noterie is in PATH
+which noterie
+
+# Should output: ~/.noterie/noterie
+```
+
+### OpenCode errors
+```bash
+# Check if opencode is installed
+which opencode
+
+# Test opencode directly
+opencode run -m opencode/grok-code "hello"
+```
+
+### Notes not saving
+```bash
+# Check if NOTERIE_DIR is set
+echo $NOTERIE_DIR
+
+# Check directory permissions
+ls -la $NOTERIE_DIR
+
+# Verify directory exists
+mkdir -p $NOTERIE_DIR
+```
+
+### Editor not opening
+```bash
+# Check EDITOR variable
+echo $EDITOR
+
+# Set it if empty
+export EDITOR=nano
+```
+
 
 ## License
 
