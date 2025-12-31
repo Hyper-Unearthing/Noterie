@@ -6,7 +6,12 @@ AI-powered note-taking CLI that uses OpenCode to manage your notes intelligently
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Hyper-Unearthing/Noterie/main/install.sh | bash
-source ~/.zshrc  # or source ~/.bashrc
+source ~/.bashrc
+```
+
+```zsh
+curl -fsSL https://raw.githubusercontent.com/Hyper-Unearthing/Noterie/main/install.sh | zsh
+source ~/.zshrc
 ```
 
 During installation, you'll be prompted to specify where you want to store your notes (default: `$HOME/notes`).
