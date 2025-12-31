@@ -225,7 +225,6 @@ opencode run -m opencode/grok-code "<multiline prompt>"
 OpenCode uses its built-in tools:
 - **Read tool**: To read files in `$NOTERIE_DIR` directory
 - **Write/Edit tools**: To create or modify files in `$NOTERIE_DIR`
-- **Bash tool**: To get current timestamp
 - **Grep/Glob tools**: To search across multiple files
 
 ### Output
@@ -286,7 +285,7 @@ This ensures noterie works whether installed in:
 
 Users can customize Noterie by editing files in `~/.noterie/`:
 
-1. **`system-prompt.txt`**: Change AI behavior, timestamp format, response style
+1. **`system-prompt.txt`**: Change AI behavior, format, response style
 2. **`strategy.md`**: Define custom note-taking philosophy
 3. **`NOTERIE_DIR`**: Specify the directory to save notes
 
