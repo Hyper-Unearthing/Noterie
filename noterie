@@ -5,7 +5,7 @@
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NOTES_FILE="$SCRIPT_DIR/notes.txt"
+NOTES_DIR="${NOTERIE_DIR}"
 LAST_NOTE="$SCRIPT_DIR/last_note"
 SYSTEM_PROMPT_FILE="$SCRIPT_DIR/system-prompt.txt"
 STRATEGY_FILE="$SCRIPT_DIR/strategy.md"
@@ -17,6 +17,22 @@ check_dependencies() {
         echo "Error: opencode not found. Please install it first."
         echo "Visit: https://opencode.ai"
         exit 1
+    fi
+}
+
+# Check if NOTERIE_DIR is set and create if needed
+check_noterie_dir() {
+    if [ -z "$NOTERIE_DIR" ]; then
+        echo "Error: NOTERIE_DIR environment variable is not set"
+        echo "Please run the installer again or manually set:"
+        echo "  export NOTERIE_DIR=\"/path/to/your/notes\""
+        exit 1
+    fi
+    
+    # Create directory if it doesn't exist
+    if [ ! -d "$NOTERIE_DIR" ]; then
+        echo "Creating notes directory: $NOTERIE_DIR"
+        mkdir -p "$NOTERIE_DIR"
     fi
 }
 
@@ -39,12 +55,10 @@ $system_prompt
 $strategy
 
 ## User Request
-The user has created a new note. Append it to the TOP of $NOTES_FILE with a timestamp in the format [YYYY-MM-DD HH:MM].
+The user has created a new note. Save it in the notes directory ($NOTES_DIR) according to your strategy.
 
 ## New Note Content
 $user_content
-
-Please append this note and confirm it has been saved.
 EOF
             ;;
         query)
@@ -55,7 +69,7 @@ $system_prompt
 $strategy
 
 ## User Request
-The user has a query about their notes. Read $NOTES_FILE and provide a helpful, concise answer.
+The user has a query about their notes. Search ALL files in $NOTES_DIR and provide a helpful, concise answer.
 
 ## Query
 $user_content
@@ -142,7 +156,7 @@ Examples:
   noterie -q "What todos do I have?"
 
 Files:
-  Notes:    $NOTES_FILE
+  Notes:    $NOTES_DIR
   Strategy: $STRATEGY_FILE
   Prompt:   $SYSTEM_PROMPT_FILE
 
@@ -153,9 +167,7 @@ EOF
 # Main entry point
 main() {
     check_dependencies
-    
-    # Ensure notes.txt exists
-    [ ! -f "$NOTES_FILE" ] && touch "$NOTES_FILE"
+    check_noterie_dir
     
     # Parse arguments
     case "${1:-}" in

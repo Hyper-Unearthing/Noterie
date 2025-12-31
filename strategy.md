@@ -6,7 +6,7 @@ This is a default note-taking strategy. You can customize this file to match you
 
 ## The Approach
 
-**Data structure**: Maintain one single text note. Maintaining more than one note and managing and sorting them into folders and recursive substructures costs way too much cognitive bloat. A single note means CTRL+F is simple and trivial.
+**Data structure**: Your notes live in a directory. The AI assistant decides how to organize them based on this strategy. You can maintain a single file if you prefer, or let the AI create multiple files. The organization is flexible - the AI will search across all files when you query your notes.
 
 **Append**: Any time any idea or any todo or anything else comes to mind, append it to the note on top, simply as text. The only exception is that you can use tags like "watch:", "listen:", or "read:" so they are easy to CTRL+F for when you're looking for something specific.
 

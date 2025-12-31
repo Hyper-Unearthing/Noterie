@@ -83,8 +83,10 @@ Noterie is a CLI tool that uses OpenCode (with Grok Code Fast model) to provide 
 ├── noterie                # Downloaded from GitHub (executable)
 ├── strategy.md            # Downloaded from GitHub (user can customize)
 ├── system-prompt.txt      # Downloaded from GitHub (user can customize)
-├── notes.txt              # Created empty locally (user's notes)
 └── last_note              # Temporary file (created/deleted as needed)
+
+$NOTERIE_DIR/              # User-specified directory (can be anywhere)
+└── (user's notes)         # Organized by AI according to strategy
 ```
 
 ## Core Components
@@ -95,8 +97,8 @@ Noterie is a CLI tool that uses OpenCode (with Grok Code Fast model) to provide 
 
 **Key Variables**:
 ```bash
-SCRIPT_DIR              # Directory where noterie is installed
-NOTES_FILE              # Path to notes.txt
+SCRIPT_DIR              # Directory where noterie is installed (~/.noterie)
+NOTES_DIR               # Set to $NOTERIE_DIR environment variable
 LAST_NOTE               # Temporary file for editor mode
 SYSTEM_PROMPT_FILE      # Path to system-prompt.txt
 STRATEGY_FILE           # Path to strategy.md
@@ -121,22 +123,22 @@ MODEL                   # OpenCode model: opencode/grok-code
 **Purpose**: Defines OpenCode's behavior and responsibilities
 
 **Key Instructions**:
-- Append notes to TOP of file with timestamp `[YYYY-MM-DD HH:MM]`
+- Decide where to save notes within the notes directory based on strategy
+- Add timestamp `[YYYY-MM-DD HH:MM]` to each note
 - Preserve user's exact wording
+- Confirm "Note saved." after saving
 - Keep responses brief and actionable
-- Use Read tool to read notes.txt
-- Use Edit tool to modify notes.txt
+- Search all files in notes directory when querying
 
 ### 3. `strategy.md` - Note-taking Strategy
 
 **Purpose**: Defines the note-taking philosophy
 
 **Key Concepts**:
-- Single text file for all notes
-- Append new notes to top
-- Notes "sink" over time
-- Review and rescue important notes
-- Use CTRL+F for searching
+- Notes live in a directory (flexible organization)
+- AI decides file structure based on strategy
+- Notes can be in single or multiple files
+- AI searches all files when querying
 
 **Customization**: Users can edit this file to match their preferred approach
 
@@ -151,11 +153,13 @@ MODEL                   # OpenCode model: opencode/grok-code
    - `system-prompt.txt`
    - `strategy.md`
 3. Make `noterie` executable
-4. Create empty `notes.txt`
-5. Detect shell (zsh/bash)
-6. Add `~/.noterie` to PATH in shell rc file
-7. Check if opencode is installed
-8. Display success message
+4. Prompt user for notes directory path
+5. Convert relative paths to absolute
+6. Detect shell (zsh/bash)
+7. Add `~/.noterie` to PATH in shell rc file
+8. Export `NOTERIE_DIR` to shell rc file
+9. Check if opencode is installed
+10. Display success message with notes directory path
 
 ## Operating Modes
 
@@ -180,13 +184,10 @@ MODEL                   # OpenCode model: opencode/grok-code
 <strategy.md content>
 
 ## User Request
-The user has created a new note. Append it to the TOP of ~/.noterie/notes.txt
-with a timestamp in the format [YYYY-MM-DD HH:MM].
+The user has created a new note. Save it in the notes directory ($NOTERIE_DIR) according to your strategy.
 
 ## New Note Content
 <contents from editor>
-
-Please append this note and confirm it has been saved.
 ```
 
 ### Mode 2: Quick Note (`noterie -n "content"`)
@@ -217,8 +218,7 @@ Please append this note and confirm it has been saved.
 <strategy.md content>
 
 ## User Request
-The user has a query about their notes. Read ~/.noterie/notes.txt and provide
-a helpful, concise answer.
+The user has a query about their notes. Search ALL files in $NOTERIE_DIR and provide a helpful, concise answer.
 
 ## Query
 <user's query>
@@ -238,9 +238,10 @@ opencode run -m opencode/grok-code "<multiline prompt>"
 
 ### File Operations
 OpenCode uses its built-in tools:
-- **Read tool**: To read `notes.txt`
-- **Edit tool**: To modify `notes.txt` (append to top)
+- **Read tool**: To read files in `$NOTERIE_DIR` directory
+- **Write/Edit tools**: To create or modify files in `$NOTERIE_DIR`
 - **Bash tool**: To get current timestamp
+- **Grep/Glob tools**: To search across multiple files
 
 ### Output
 - Full OpenCode response is displayed to user
@@ -253,7 +254,7 @@ OpenCode uses its built-in tools:
 ```
 User input → noterie script → Build prompt → OpenCode
                                                ↓
-User ← Display output ← Return response ← Edit notes.txt
+User ← Display output ← Return response ← Save to $NOTERIE_DIR
                                                ↓
                                           Add timestamp
                                           Prepend to top
@@ -263,9 +264,9 @@ User ← Display output ← Return response ← Edit notes.txt
 ```
 User query → noterie script → Build prompt → OpenCode
                                                ↓
-User ← Display output ← Return response ← Read notes.txt
+User ← Display output ← Return response ← Search $NOTERIE_DIR
                                                ↓
-                                          Search content
+                                          Read multiple files
                                           Find relevant notes
 ```
 
@@ -274,11 +275,12 @@ User ← Display output ← Return response ← Read notes.txt
 | Scenario | Behavior |
 |----------|----------|
 | OpenCode not installed | Show error, exit with code 1 |
+| `$NOTERIE_DIR` not set | Show error, exit with code 1 |
 | `$EDITOR` not set | Default to `nano` |
 | Empty editor content | Show "No note added", skip OpenCode |
 | Empty `-n` argument | Show error and usage |
 | Empty `-q` argument | Show error and usage |
-| `notes.txt` doesn't exist | Create it automatically |
+| `$NOTERIE_DIR` doesn't exist | Create directory automatically |
 | Invalid argument | Show error and help text |
 
 ## File Paths
@@ -297,7 +299,7 @@ This ensures noterie works whether installed in:
 ## Security Considerations
 
 - **No API keys required**: Uses OpenCode which handles authentication
-- **Local file storage**: All notes stored locally in `~/.noterie/notes.txt`
+- **Local file storage**: All notes stored in user-specified `$NOTERIE_DIR`
 - **No network requests**: Except to OpenCode API (via opencode CLI)
 - **Customizable**: Users can modify system prompt and strategy
 
@@ -357,11 +359,14 @@ Displays success message
 - Easy to customize
 - Works on all Unix-like systems
 
-### Why Single Notes File?
-- Follows append-and-review philosophy
-- Simple CTRL+F searching
-- No cognitive overhead of organizing folders
-- Natural prioritization (recent = top)
+### Why User-Specified Directory?
+- Flexibility to use existing note directories
+- Integration with cloud sync (Dropbox, iCloud, etc.)
+- Users can choose their own version control setup
+- No opinionated file organization
+- Works with existing workflows
+- AI decides structure based on user's strategy
+- Search across all files seamlessly
 
 ### Why OpenCode?
 - Powerful file operations
@@ -385,11 +390,9 @@ Displays success message
 
 - Config file for model selection
 - Custom timestamp formats
-- Multiple note files (tags/categories)
 - Export/import functionality
 - Integration with other note systems
 - Web interface
-- Sync capabilities
 - Search improvements
 - Review mode automation
 
@@ -429,11 +432,14 @@ opencode run -m opencode/grok-code "hello"
 
 ### Notes not saving
 ```bash
-# Check file permissions
-ls -la ~/.noterie/notes.txt
+# Check if NOTERIE_DIR is set
+echo $NOTERIE_DIR
 
-# Verify file exists and is writable
-touch ~/.noterie/notes.txt
+# Check directory permissions
+ls -la $NOTERIE_DIR
+
+# Verify directory exists
+mkdir -p $NOTERIE_DIR
 ```
 
 ### Editor not opening

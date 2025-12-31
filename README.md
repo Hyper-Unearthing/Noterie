@@ -9,6 +9,8 @@ curl -fsSL https://raw.githubusercontent.com/Hyper-Unearthing/Noterie/main/insta
 source ~/.zshrc  # or source ~/.bashrc
 ```
 
+During installation, you'll be prompted to specify where you want to store your notes (default: `$HOME/notes`).
+
 ## Usage
 
 ### Add a note (interactive editor)
@@ -32,10 +34,11 @@ Ask questions about your notes. The AI will search through your notes and provid
 ## How it works
 
 Noterie uses OpenCode (specifically Grok Code Fast) to intelligently manage your notes:
-- Notes are stored in `~/.noterie/notes.txt`
+- Notes are stored in your configured directory (`$NOTERIE_DIR`)
+- The AI organizes files based on your customizable strategy
 - Each note gets a timestamp when added: `[YYYY-MM-DD HH:MM]`
-- Your notes remain in plain text, searchable with CTRL+F
-- The AI follows a customizable note-taking strategy
+- Your notes remain in plain text and searchable
+- Query across all your notes - the AI searches the entire directory
 
 ## Customization
 
@@ -43,7 +46,14 @@ You can customize Noterie by editing files in `~/.noterie/`:
 
 - **`system-prompt.txt`** - Instructions for the AI assistant
 - **`strategy.md`** - The note-taking strategy/philosophy
-- **`notes.txt`** - Your actual notes (managed by noterie commands)
+
+Your notes are stored in `$NOTERIE_DIR` (set during installation).
+
+**To change your notes directory:**
+```bash
+export NOTERIE_DIR="/new/path/to/notes"
+# Add this to your ~/.zshrc or ~/.bashrc to make it permanent
+```
 
 ## Requirements
 
@@ -53,8 +63,10 @@ You can customize Noterie by editing files in `~/.noterie/`:
 ## Uninstallation
 
 ```bash
+# Your notes in $NOTERIE_DIR are safe and won't be deleted
+
 rm -rf ~/.noterie
-# Remove the PATH export line from your ~/.zshrc or ~/.bashrc
+# Remove the PATH and NOTERIE_DIR export lines from your ~/.zshrc or ~/.bashrc
 ```
 
 ## License
